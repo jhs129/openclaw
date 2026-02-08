@@ -17,7 +17,15 @@ type StoredIdentity = {
   createdAtMs: number;
 };
 
-const DEFAULT_DIR = path.join(os.homedir(), ".openclaw", "identity");
+function resolveIdentityDir(): string {
+  const stateDir = process.env.OPENCLAW_STATE_DIR?.trim();
+  if (stateDir) {
+    return path.join(stateDir, "identity");
+  }
+  return path.join(os.homedir(), ".openclaw", "identity");
+}
+
+const DEFAULT_DIR = resolveIdentityDir();
 const DEFAULT_FILE = path.join(DEFAULT_DIR, "device.json");
 
 function ensureDir(filePath: string) {
