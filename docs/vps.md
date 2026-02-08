@@ -17,6 +17,7 @@ deployments work at a high level.
 - **Northflank** (one‑click + browser setup): [Northflank](/install/northflank)
 - **Oracle Cloud (Always Free)**: [Oracle](/platforms/oracle) — $0/month (Always Free, ARM; capacity/signup can be finicky)
 - **Fly.io**: [Fly.io](/install/fly)
+- **Azure VM (Docker)**: [Azure VM](/install/azure-vm) — ~$20/month (B1ms VM + ACR)
 - **Hetzner (Docker)**: [Hetzner](/install/hetzner)
 - **GCP (Compute Engine)**: [GCP](/install/gcp)
 - **exe.dev** (VM + HTTPS proxy): [exe.dev](/install/exe-dev)

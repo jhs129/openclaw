@@ -5,9 +5,33 @@ import { describe, expect, test } from "vitest";
 import {
   approveDevicePairing,
   getPairedDevice,
+  hasPairedDevices,
   requestDevicePairing,
   rotateDeviceToken,
 } from "./device-pairing.js";
+
+describe("hasPairedDevices", () => {
+  test("returns false on fresh state", async () => {
+    const baseDir = await mkdtemp(join(tmpdir(), "openclaw-device-pairing-"));
+    expect(await hasPairedDevices(baseDir)).toBe(false);
+  });
+
+  test("returns true after approving a device", async () => {
+    const baseDir = await mkdtemp(join(tmpdir(), "openclaw-device-pairing-"));
+    const request = await requestDevicePairing(
+      {
+        deviceId: "device-1",
+        publicKey: "public-key-1",
+        role: "operator",
+        scopes: ["operator.admin"],
+      },
+      baseDir,
+    );
+    expect(await hasPairedDevices(baseDir)).toBe(false);
+    await approveDevicePairing(request.request.requestId, baseDir);
+    expect(await hasPairedDevices(baseDir)).toBe(true);
+  });
+});
 
 describe("device pairing tokens", () => {
   test("preserves existing token scopes when rotating without scopes", async () => {

@@ -235,6 +235,15 @@ function newToken() {
   return randomUUID().replaceAll("-", "");
 }
 
+export async function hasPairedDevices(baseDir?: string): Promise<boolean> {
+  const { pairedPath } = resolvePaths(baseDir);
+  const paired = await readJSON<Record<string, PairedDevice>>(pairedPath);
+  if (!paired) {
+    return false;
+  }
+  return Object.keys(paired).length > 0;
+}
+
 export async function listDevicePairing(baseDir?: string): Promise<DevicePairingList> {
   const state = await loadState(baseDir);
   const pending = Object.values(state.pendingById).toSorted((a, b) => b.ts - a.ts);

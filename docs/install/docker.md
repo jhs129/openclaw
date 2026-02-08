@@ -83,8 +83,12 @@ docker compose -f docker-compose.yml -f docker-compose.extra.yml <command>
 
 ### Control UI token + pairing (Docker)
 
-If you see “unauthorized” or “disconnected (1008): pairing required”, fetch a
-fresh dashboard link and approve the browser device:
+The first browser that connects with a valid gateway token is **auto-approved**
+(bootstrap mode). After that first device is paired, additional devices require
+manual approval.
+
+If you see "unauthorized" or "disconnected (1008): pairing required" on a
+subsequent device, fetch a fresh dashboard link and approve the browser device:
 
 ```bash
 docker compose run --rm openclaw-cli dashboard --no-open

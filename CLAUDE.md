@@ -114,6 +114,39 @@ pnpm build && pnpm check && pnpm test
 - Prefer rebase for clean history, squash for messy history.
 - AI-assisted PRs: mark as AI-assisted, note testing level, include session logs if possible.
 
+## Deployment (Fly.io)
+
+Production gateway runs on [Fly.io](https://fly.io) (`openclaw-jhs` app, `iad` region).
+
+```bash
+# Deploy (builds remotely on Fly)
+fly deploy --app openclaw-jhs
+
+# Manage secrets
+fly secrets set ANTHROPIC_API_KEY=sk-ant-... --app openclaw-jhs
+fly secrets set OPENCLAW_GATEWAY_TOKEN=... --app openclaw-jhs
+
+# SSH into the machine
+fly ssh console --app openclaw-jhs
+
+# Logs
+fly logs --app openclaw-jhs
+
+# Status
+fly status --app openclaw-jhs
+```
+
+- **Config**: `fly.toml` in repo root (app name: `openclaw-jhs`, region: `iad`)
+- **Persistent volume**: `openclaw_data` mounted at `/data` (1 GB, encrypted)
+- **State dir**: `OPENCLAW_STATE_DIR=/data` — SQLite DBs, config, sessions all live here
+- **Entrypoint**: `node dist/index.js gateway --allow-unconfigured --port 3000 --bind lan`
+- **URL**: `https://openclaw-jhs.fly.dev/`
+- **VM**: `shared-cpu-2x`, 2048 MB RAM
+- **Cost**: ~$10-15/month
+- **Gateway startup**: Takes ~30s; Fly health check warnings during deploy are expected
+
+Previous Azure ACI deployment has been fully torn down (container, storage, ACR, resource group all deleted).
+
 ## Multi-Agent Safety
 
 - Do not create/apply/drop `git stash` entries unless explicitly requested.

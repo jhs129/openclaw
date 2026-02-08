@@ -15,6 +15,7 @@ import {
   approveDevicePairing,
   ensureDeviceToken,
   getPairedDevice,
+  hasPairedDevices,
   requestDevicePairing,
   updatePairedDeviceMetadata,
   verifyDeviceToken,
@@ -677,6 +678,13 @@ export function attachGatewayWsMessageHandler(params: {
 
         const skipPairing = allowControlUiBypass && sharedAuthOk;
         if (device && devicePublicKey && !skipPairing) {
+          // Bootstrap mode: auto-approve the first device when no paired devices
+          // exist and the client passed shared-secret (token/password) auth.
+          let bootstrapMode = false;
+          if (sharedAuthOk && !isLocalClient) {
+            bootstrapMode = !(await hasPairedDevices());
+          }
+
           const requirePairing = async (reason: string, _paired?: { deviceId: string }) => {
             const pairing = await requestDevicePairing({
               deviceId: device.id,
@@ -688,14 +696,15 @@ export function attachGatewayWsMessageHandler(params: {
               role,
               scopes,
               remoteIp: reportedClientIp,
-              silent: isLocalClient,
+              silent: isLocalClient || bootstrapMode,
             });
             const context = buildRequestContext();
             if (pairing.request.silent === true) {
               const approved = await approveDevicePairing(pairing.request.requestId);
               if (approved) {
+                const approvalReason = bootstrapMode ? "bootstrap (first device)" : "local";
                 logGateway.info(
-                  `device pairing auto-approved device=${approved.device.deviceId} role=${approved.device.role ?? "unknown"}`,
+                  `device pairing auto-approved (${approvalReason}) device=${approved.device.deviceId} role=${approved.device.role ?? "unknown"}`,
                 );
                 context.broadcast(
                   "device.pair.resolved",

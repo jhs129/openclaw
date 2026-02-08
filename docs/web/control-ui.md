@@ -56,7 +56,13 @@ you revoke it with `openclaw devices revoke --device <id> --role <role>`. See
 **Notes:**
 
 - Local connections (`127.0.0.1`) are auto-approved.
-- Remote connections (LAN, Tailnet, etc.) require explicit approval.
+- **Bootstrap mode:** The very first remote device is auto-approved when no
+  paired devices exist yet and the client provides a valid gateway
+  token/password. This makes initial setup seamless for remote deployments
+  (Fly.io, Docker, etc.). After the first device is paired, all subsequent
+  remote devices require explicit approval.
+- Remote connections (LAN, Tailnet, etc.) require explicit approval after the
+  first device is paired.
 - Each browser profile generates a unique device ID, so switching browsers or
   clearing browser data will require re-pairing.
 

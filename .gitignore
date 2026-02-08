@@ -15,6 +15,7 @@ coverage
 ui/src/ui/__screenshots__/
 ui/playwright-report/
 ui/test-results/
+gcp_rocklobsah_client.json
 
 # Bun build artifacts
 *.bun-build

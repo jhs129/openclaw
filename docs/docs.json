@@ -818,6 +818,7 @@
                   "install/fly",
                   "install/hetzner",
                   "install/gcp",
+                  "install/azure-vm",
                   "install/azure-aci",
                   "install/macos-vm",
                   "install/exe-dev",
