@@ -35,7 +35,8 @@ RUN apt-get update && \
       python3-venv \
       libasound2 \
       libssl3 \
-      libdbus-1-3 && \
+      libdbus-1-3 \
+      unzip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
@@ -72,9 +73,14 @@ RUN curl -fsSL https://github.com/aome510/spotify-player/releases/download/v0.21
 RUN curl -fsSL https://github.com/ankitpokhrel/jira-cli/releases/download/v1.7.0/jira_1.7.0_linux_x86_64.tar.gz \
     | tar xz --strip-components=2 -C /usr/local/bin jira_1.7.0_linux_x86_64/bin/jira
 
+# 1Password CLI (op) — for vault access at runtime
+RUN curl -fsSL https://cache.agilebits.com/dist/1P/op2/pkg/v2.30.3/op_linux_amd64_v2.30.3.zip -o /tmp/op.zip && \
+    unzip -o /tmp/op.zip -d /usr/local/bin op && \
+    rm /tmp/op.zip
+
 # Ensure all binaries are executable
 RUN chmod +x /usr/local/bin/gog /usr/local/bin/himalaya /usr/local/bin/sag \
-    /usr/local/bin/spotify_player /usr/local/bin/jira
+    /usr/local/bin/spotify_player /usr/local/bin/jira /usr/local/bin/op
 
 # Install npm-based CLI tools
 RUN npm install -g \

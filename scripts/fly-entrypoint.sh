@@ -14,6 +14,16 @@ DATA_DIR="${OPENCLAW_STATE_DIR:-/data}"
 BIN_DIR="$DATA_DIR/bin"
 NPM_GLOBAL_DIR="$DATA_DIR/npm-global"
 
+# Ensure ~/.openclaw symlinks to persistent volume so agent config
+# (exec-approvals, workspace, identity) survives across deploys
+OPENCLAW_DOT_DIR="$DATA_DIR/.openclaw"
+HOME_DOT_DIR="$HOME/.openclaw"
+if [ -d "$OPENCLAW_DOT_DIR" ] && [ ! -L "$HOME_DOT_DIR" ]; then
+  rm -rf "$HOME_DOT_DIR"
+  ln -s "$OPENCLAW_DOT_DIR" "$HOME_DOT_DIR"
+  echo "[fly-entrypoint] symlinked $HOME_DOT_DIR -> $OPENCLAW_DOT_DIR"
+fi
+
 mkdir -p "$BIN_DIR" 2>/dev/null || true
 
 # Verify we can write to the bin directory
@@ -183,7 +193,63 @@ ensure_gh || log "gh: skipped (non-fatal error)"
 # Install npm global packages (background — don't block gateway startup)
 ensure_npm_packages &
 
-log "tool check complete. starting application..."
+log "tool check complete."
+
+# ── Workspace versioning ──────────────────────────────────────────────────
+# Auto-commit and push Larry's workspace to a private GitHub repo on boot.
+
+WORKSPACE_DIR="$DATA_DIR/.openclaw/workspace"
+
+# Fix "dubious ownership" error (volume is owned by root, container runs as node)
+git config --global --add safe.directory "$WORKSPACE_DIR" 2>/dev/null || true
+
+if [ -d "$WORKSPACE_DIR" ] && [ -n "${GH_WORKSPACE_TOKEN:-}" ]; then
+  cd "$WORKSPACE_DIR"
+
+  # Initialize git repo if not already one
+  if [ ! -d .git ]; then
+    git init
+    git checkout -b main 2>/dev/null || true
+  fi
+
+  # Configure remote with token auth
+  REMOTE_URL="https://x-access-token:${GH_WORKSPACE_TOKEN}@github.com/jhs129/larry-workspace.git"
+  if git remote get-url origin &>/dev/null; then
+    git remote set-url origin "$REMOTE_URL"
+  else
+    git remote add origin "$REMOTE_URL"
+  fi
+
+  # Set commit identity
+  git config user.email "larry@openclaw.dev"
+  git config user.name "Larry"
+
+  # Ensure .gitignore exists with sensible defaults
+  if [ ! -f .gitignore ]; then
+    cat > .gitignore <<'GITIGNORE'
+*.jsonl
+*.tmp
+*.bak
+client_secret.json
+GITIGNORE
+  fi
+
+  # Auto-commit and push
+  git add -A
+  if ! git diff --cached --quiet; then
+    git commit -m "auto: workspace snapshot $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    log "workspace: committed changes"
+  fi
+  git push -u origin main 2>/dev/null && log "workspace: pushed to remote" || log "workspace: push skipped (remote may not exist yet)"
+
+  cd /app
+else
+  if [ -z "${GH_WORKSPACE_TOKEN:-}" ]; then
+    log "workspace: GH_WORKSPACE_TOKEN not set, skipping versioning"
+  fi
+fi
+
+log "starting application..."
 
 # Hand off to the actual command
 exec "$@"
