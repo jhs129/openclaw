@@ -6,6 +6,14 @@ RUN git clone https://github.com/steipete/gogcli.git /tmp/gogcli && \
 
 FROM node:22-bookworm
 
+# Install curl and ca-certificates (required for bun installation)
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      curl \
+      ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
+
 # Install Bun (required for build scripts)
 RUN curl -fsSL https://bun.sh/install | bash
 ENV PATH="/root/.bun/bin:${PATH}"
