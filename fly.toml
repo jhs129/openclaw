@@ -22,9 +22,6 @@ XDG_CONFIG_HOME = "/data/config"
 [processes]
 app = "/app/scripts/fly-entrypoint.sh node dist/index.js gateway --allow-unconfigured --port 3000 --bind lan"
 
-[deploy]
-strategy = "canary"
-
 [http_service]
 internal_port = 3000
 force_https = true
