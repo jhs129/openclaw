@@ -190,8 +190,20 @@ done
 # Install gh (special handling, non-fatal)
 ensure_gh || log "gh: skipped (non-fatal error)"
 
-# Install npm global packages (background — don't block gateway startup)
-ensure_npm_packages &
+# Install npm global packages AFTER gateway is listening to avoid memory
+# pressure during startup. The gateway's ESM module graph is large and
+# concurrent npm installs can push the VM past its memory limit.
+(
+  # Wait for gateway to become ready before starting npm installs
+  for i in $(seq 1 60); do
+    if curl -s -o /dev/null http://localhost:3000/ 2>/dev/null; then
+      log "gateway is listening — starting deferred npm package installs"
+      ensure_npm_packages
+      break
+    fi
+    sleep 5
+  done
+) &
 
 log "tool check complete."
 

@@ -22,6 +22,9 @@ XDG_CONFIG_HOME = "/data/config"
 [processes]
 app = "/app/scripts/fly-entrypoint.sh node dist/index.js gateway --allow-unconfigured --port 3000 --bind lan"
 
+[deploy]
+strategy = "canary"
+
 [http_service]
 internal_port = 3000
 force_https = true
@@ -29,6 +32,14 @@ auto_stop_machines = false # Keep running for persistent connections
 auto_start_machines = true
 min_machines_running = 1
 processes = ["app"]
+
+# Health check: canary must respond on / before deploy proceeds
+[[http_service.checks]]
+grace_period = "45s"
+interval = "5s"
+method = "GET"
+path = "/"
+timeout = "5s"
 
 [[vm]]
 size = "shared-cpu-4x"
