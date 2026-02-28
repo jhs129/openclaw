@@ -253,8 +253,8 @@ function buildDeviceAuthToken(params: {
 }
 
 export async function hasPairedDevices(baseDir?: string): Promise<boolean> {
-  const { pairedPath } = resolvePaths(baseDir);
-  const paired = await readJSON<Record<string, PairedDevice>>(pairedPath);
+  const { pairedPath } = resolvePairingPaths(baseDir, "devices");
+  const paired = await readJsonFile<Record<string, PairedDevice>>(pairedPath);
   if (!paired) {
     return false;
   }
