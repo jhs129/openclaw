@@ -1,9 +1,9 @@
 import type { AssistantMessage } from "@mariozechner/pi-ai";
 import type { OpenClawConfig } from "../../config/config.js";
-import type { FailoverReason } from "./types.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import { formatSandboxToolPolicyBlockedMessage } from "../sandbox.js";
 import { stableStringify } from "../stable-stringify.js";
+import type { FailoverReason } from "./types.js";
 
 const log = createSubsystemLogger("errors");
 

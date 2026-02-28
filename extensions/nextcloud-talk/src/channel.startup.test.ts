@@ -4,8 +4,8 @@ import type {
   OpenClawConfig,
 } from "openclaw/plugin-sdk";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { ResolvedNextcloudTalkAccount } from "./accounts.js";
 import { createRuntimeEnv } from "../../test-utils/runtime-env.js";
+import type { ResolvedNextcloudTalkAccount } from "./accounts.js";
 
 const hoisted = vi.hoisted(() => ({
   monitorNextcloudTalkProvider: vi.fn(),

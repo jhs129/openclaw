@@ -1,6 +1,6 @@
-import type { OpenClawConfig } from "../config/types.openclaw.js";
 import { listAgentIds, resolveDefaultAgentId } from "../agents/agent-scope.js";
 import { resolveStorePath } from "../config/sessions.js";
+import type { OpenClawConfig } from "../config/types.openclaw.js";
 import { normalizeAgentId } from "../routing/session-key.js";
 
 export type SessionStoreSelectionOptions = {

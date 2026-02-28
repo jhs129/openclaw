@@ -1,5 +1,5 @@
-import type { FeishuProbeResult } from "./types.js";
 import { createFeishuClient, type FeishuClientCredentials } from "./client.js";
+import type { FeishuProbeResult } from "./types.js";
 
 /** Cache successful probe results to reduce API calls (bot info is static).
  * Gateway health checks call probeFeishu() every minute; without caching this

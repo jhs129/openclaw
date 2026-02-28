@@ -11,6 +11,7 @@ import {
 } from "node:fs";
 import path from "node:path";
 import type { ReplyPayload } from "../auto-reply/types.js";
+import { normalizeChannelId } from "../channels/plugins/index.js";
 import type { ChannelId } from "../channels/plugins/types.js";
 import type { OpenClawConfig } from "../config/config.js";
 import type {
@@ -20,7 +21,6 @@ import type {
   TtsProvider,
   TtsModelOverrideConfig,
 } from "../config/types.tts.js";
-import { normalizeChannelId } from "../channels/plugins/index.js";
 import { logVerbose } from "../globals.js";
 import { resolvePreferredOpenClawTmpDir } from "../infra/tmp-openclaw-dir.js";
 import { stripMarkdown } from "../line/markdown-to-line.js";

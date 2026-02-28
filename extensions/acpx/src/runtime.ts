@@ -1,3 +1,4 @@
+import { createInterface } from "node:readline";
 import type {
   AcpRuntimeCapabilities,
   AcpRuntimeDoctorReport,
@@ -10,7 +11,6 @@ import type {
   AcpRuntimeTurnInput,
   PluginLogger,
 } from "openclaw/plugin-sdk";
-import { createInterface } from "node:readline";
 import { AcpRuntimeError } from "openclaw/plugin-sdk";
 import {
   ACPX_LOCAL_INSTALL_COMMAND,

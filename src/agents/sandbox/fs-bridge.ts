@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import type { SandboxContext, SandboxWorkspaceAccess } from "./types.js";
 import { openBoundaryFile } from "../../infra/boundary-file-read.js";
 import { PATH_ALIAS_POLICIES, type PathAliasPolicy } from "../../infra/path-alias-guards.js";
 import { execDockerRaw, type ExecDockerRawResult } from "./docker.js";
@@ -10,6 +9,7 @@ import {
   type SandboxFsMount,
 } from "./fs-paths.js";
 import { isPathInsideContainerRoot, normalizeContainerPath } from "./path-utils.js";
+import type { SandboxContext, SandboxWorkspaceAccess } from "./types.js";
 
 type RunCommandOptions = {
   args?: string[];

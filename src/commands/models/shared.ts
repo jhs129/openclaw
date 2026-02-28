@@ -1,4 +1,3 @@
-import type { AgentModelConfig } from "../../config/types.agents-shared.js";
 import { listAgentIds } from "../../agents/agent-scope.js";
 import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "../../agents/defaults.js";
 import {
@@ -14,6 +13,7 @@ import {
   writeConfigFile,
 } from "../../config/config.js";
 import { toAgentModelListLike } from "../../config/model-input.js";
+import type { AgentModelConfig } from "../../config/types.agents-shared.js";
 import { normalizeAgentId } from "../../routing/session-key.js";
 
 export const ensureFlagCompatibility = (opts: { json?: boolean; plain?: boolean }) => {

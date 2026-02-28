@@ -1,7 +1,5 @@
 import type { OpenClawConfig } from "../../../config/config.js";
 import type { DiscordGuildEntry } from "../../../config/types.discord.js";
-import type { WizardPrompter } from "../../../wizard/prompts.js";
-import type { ChannelOnboardingAdapter, ChannelOnboardingDmPolicy } from "../onboarding-types.js";
 import {
   listDiscordAccountIds,
   resolveDefaultDiscordAccountId,
@@ -15,6 +13,8 @@ import {
 import { resolveDiscordUserAllowlist } from "../../../discord/resolve-users.js";
 import { DEFAULT_ACCOUNT_ID } from "../../../routing/session-key.js";
 import { formatDocsLink } from "../../../terminal/links.js";
+import type { WizardPrompter } from "../../../wizard/prompts.js";
+import type { ChannelOnboardingAdapter, ChannelOnboardingDmPolicy } from "../onboarding-types.js";
 import { configureChannelAccessWithAllowlist } from "./channel-access-configure.js";
 import {
   applySingleTokenPromptResult,

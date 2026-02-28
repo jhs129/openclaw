@@ -1,10 +1,4 @@
 import { fetchWithSsrFGuard, type SsrFPolicy } from "openclaw/plugin-sdk";
-import type {
-  MSTeamsAccessTokenProvider,
-  MSTeamsAttachmentLike,
-  MSTeamsGraphMediaResult,
-  MSTeamsInboundMedia,
-} from "./types.js";
 import { getMSTeamsRuntime } from "../runtime.js";
 import { downloadMSTeamsAttachments } from "./download.js";
 import { downloadAndStoreMSTeamsRemoteMedia } from "./remote-media.js";
@@ -18,6 +12,12 @@ import {
   resolveRequestUrl,
   resolveAllowedHosts,
 } from "./shared.js";
+import type {
+  MSTeamsAccessTokenProvider,
+  MSTeamsAttachmentLike,
+  MSTeamsGraphMediaResult,
+  MSTeamsInboundMedia,
+} from "./types.js";
 
 type GraphHostedContent = {
   id?: string | null;

@@ -1,12 +1,4 @@
 import type { AgentToolResult } from "@mariozechner/pi-agent-core";
-import type {
-  ChannelId,
-  ChannelMessageActionName,
-  ChannelThreadingToolContext,
-} from "../../channels/plugins/types.js";
-import type { OpenClawConfig } from "../../config/config.js";
-import type { OutboundSendDeps } from "./deliver.js";
-import type { MessagePollResult, MessageSendResult } from "./message.js";
 import { resolveSessionAgentId } from "../../agents/agent-scope.js";
 import {
   readNumberParam,
@@ -15,6 +7,12 @@ import {
 } from "../../agents/tools/common.js";
 import { parseReplyDirectives } from "../../auto-reply/reply/reply-directives.js";
 import { dispatchChannelMessageAction } from "../../channels/plugins/message-actions.js";
+import type {
+  ChannelId,
+  ChannelMessageActionName,
+  ChannelThreadingToolContext,
+} from "../../channels/plugins/types.js";
+import type { OpenClawConfig } from "../../config/config.js";
 import { getAgentScopedMediaLocalRoots } from "../../media/local-roots.js";
 import { buildChannelAccountBindings } from "../../routing/bindings.js";
 import { normalizeAgentId } from "../../routing/session-key.js";
@@ -30,6 +28,7 @@ import {
   resolveMessageChannelSelection,
 } from "./channel-selection.js";
 import { applyTargetToParams } from "./channel-target.js";
+import type { OutboundSendDeps } from "./deliver.js";
 import {
   hydrateAttachmentParamsForAction,
   normalizeSandboxMediaList,
@@ -43,6 +42,7 @@ import {
   resolveTelegramAutoThreadId,
 } from "./message-action-params.js";
 import { actionHasTarget, actionRequiresTarget } from "./message-action-spec.js";
+import type { MessagePollResult, MessageSendResult } from "./message.js";
 import {
   applyCrossContextDecoration,
   buildCrossContextDecoration,

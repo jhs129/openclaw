@@ -1,9 +1,9 @@
 import type { OpenClawConfig } from "../../../config/config.js";
 import type { DmPolicy, GroupPolicy } from "../../../config/types.js";
-import type { WizardPrompter } from "../../../wizard/prompts.js";
-import type { PromptAccountId, PromptAccountIdParams } from "../onboarding-types.js";
 import { promptAccountId as promptAccountIdSdk } from "../../../plugin-sdk/onboarding.js";
 import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "../../../routing/session-key.js";
+import type { WizardPrompter } from "../../../wizard/prompts.js";
+import type { PromptAccountId, PromptAccountIdParams } from "../onboarding-types.js";
 import { moveSingleAccountChannelSectionToDefaultAccount } from "../setup-helpers.js";
 
 export const promptAccountId: PromptAccountId = async (params: PromptAccountIdParams) => {

@@ -1,9 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "./types.js";
 import { withTempHome } from "./home-env.test-harness.js";
 import { createConfigIO } from "./io.js";
+import type { OpenClawConfig } from "./types.js";
 
 describe("config io write", () => {
   const silentLogger = {
