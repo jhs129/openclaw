@@ -15,7 +15,7 @@ OPENCLAW_STATE_DIR = "/data"
 # Put .openclaw/ (workspace, exec-approvals, identity) on the persistent volume
 # so agent memory survives container rebuilds and user-switch changes
 OPENCLAW_HOME = "/data"
-NODE_OPTIONS = "--max-old-space-size=4096"
+NODE_OPTIONS = "--max-old-space-size=6144"
 # Persist CLI tool configs (gogcli, gh, himalaya, jira, etc.) across VM restarts
 XDG_CONFIG_HOME = "/data/config"
 
