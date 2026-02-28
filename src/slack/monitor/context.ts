@@ -4,6 +4,7 @@ import type { OpenClawConfig, SlackReactionNotificationMode } from "../../config
 import type { DmPolicy, GroupPolicy } from "../../config/types.js";
 import type { RuntimeEnv } from "../../runtime.js";
 import type { SlackMessageEvent } from "../types.js";
+import type { SlackChannelConfigEntries } from "./channel-config.js";
 import { formatAllowlistMatchMeta } from "../../channels/allowlist-match.js";
 import { resolveSessionKey, type SessionScope } from "../../config/sessions.js";
 import { logVerbose } from "../../globals.js";
@@ -37,15 +38,20 @@ export function normalizeSlackChannelType(
   channelId?: string | null,
 ): SlackMessageEvent["channel_type"] {
   const normalized = channelType?.trim().toLowerCase();
+  const inferred = inferSlackChannelType(channelId);
   if (
     normalized === "im" ||
     normalized === "mpim" ||
     normalized === "channel" ||
     normalized === "group"
   ) {
+    // D-prefix channel IDs are always DMs — override a contradicting channel_type.
+    if (inferred === "im" && normalized !== "im") {
+      return "im";
+    }
     return normalized;
   }
-  return inferSlackChannelType(channelId) ?? "channel";
+  return inferred ?? "channel";
 }
 
 export type SlackMonitorContext = {
@@ -67,21 +73,11 @@ export type SlackMonitorContext = {
   dmEnabled: boolean;
   dmPolicy: DmPolicy;
   allowFrom: string[];
+  allowNameMatching: boolean;
   groupDmEnabled: boolean;
   groupDmChannels: string[];
   defaultRequireMention: boolean;
-  channelsConfig?: Record<
-    string,
-    {
-      enabled?: boolean;
-      allow?: boolean;
-      requireMention?: boolean;
-      allowBots?: boolean;
-      users?: Array<string | number>;
-      skills?: string[];
-      systemPrompt?: string;
-    }
-  >;
+  channelsConfig?: SlackChannelConfigEntries;
   groupPolicy: GroupPolicy;
   useAccessGroups: boolean;
   reactionMode: SlackReactionNotificationMode;
@@ -139,6 +135,7 @@ export function createSlackMonitorContext(params: {
   dmEnabled: boolean;
   dmPolicy: DmPolicy;
   allowFrom: Array<string | number> | undefined;
+  allowNameMatching: boolean;
   groupDmEnabled: boolean;
   groupDmChannels: Array<string | number> | undefined;
   defaultRequireMention?: boolean;
@@ -401,6 +398,7 @@ export function createSlackMonitorContext(params: {
     dmEnabled: params.dmEnabled,
     dmPolicy: params.dmPolicy,
     allowFrom,
+    allowNameMatching: params.allowNameMatching,
     groupDmEnabled: params.groupDmEnabled,
     groupDmChannels,
     defaultRequireMention,

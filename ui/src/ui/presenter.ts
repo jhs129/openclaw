@@ -18,7 +18,8 @@ export function formatNextRun(ms?: number | null) {
   if (!ms) {
     return "n/a";
   }
-  return `${formatMs(ms)} (${formatRelativeTimestamp(ms)})`;
+  const weekday = new Date(ms).toLocaleDateString(undefined, { weekday: "short" });
+  return `${weekday}, ${formatMs(ms)} (${formatRelativeTimestamp(ms)})`;
 }
 
 export function formatSessionTokens(row: GatewaySessionRow) {
@@ -71,9 +72,13 @@ export function formatCronPayload(job: CronJob) {
   const delivery = job.delivery;
   if (delivery && delivery.mode !== "none") {
     const target =
-      delivery.channel || delivery.to
-        ? ` (${delivery.channel ?? "last"}${delivery.to ? ` -> ${delivery.to}` : ""})`
-        : "";
+      delivery.mode === "webhook"
+        ? delivery.to
+          ? ` (${delivery.to})`
+          : ""
+        : delivery.channel || delivery.to
+          ? ` (${delivery.channel ?? "last"}${delivery.to ? ` -> ${delivery.to}` : ""})`
+          : "";
     return `${base} · ${delivery.mode}${target}`;
   }
   return base;

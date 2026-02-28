@@ -13,9 +13,9 @@ export async function setupInternalHooks(
   await prompter.note(
     [
       "Hooks let you automate actions when agent commands are issued.",
-      "Example: Save session context to memory when you issue /new.",
+      "Example: Save session context to memory when you issue /new or /reset.",
       "",
-      "Learn more: https://docs.openclaw.ai/hooks",
+      "Learn more: https://docs.openclaw.ai/automation/hooks",
     ].join("\n"),
     "Hooks",
   );
