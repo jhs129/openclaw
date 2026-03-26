@@ -13,6 +13,7 @@ export type WebhooksConfigResolved = {
   token: string;
   presets: string[];
   maxBodyBytes: number;
+  agentRoutes: Record<string, string>;
 };
 
 export type WebhooksRequestHandler = (
@@ -45,6 +46,7 @@ export function createWebhooksRequestHandler(opts: {
     name: string;
     wakeMode: "now" | "next-heartbeat";
     sessionKey: string;
+    agentId?: string;
     deliver: boolean;
     channel: HookMessageChannel;
     to?: string;
@@ -146,11 +148,13 @@ export function createWebhooksRequestHandler(opts: {
     }
 
     // Dispatch to agent
+    const agentId = webhooksConfig.agentRoutes[source];
     const runId = dispatchAgentHook({
       message: result.message,
       name: result.name,
       wakeMode: "now",
       sessionKey: result.sessionKey,
+      agentId,
       deliver: true,
       channel: "last",
     });

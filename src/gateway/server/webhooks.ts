@@ -26,6 +26,7 @@ export function createGatewayWebhooksRequestHandler(params: {
     name: string;
     wakeMode: "now" | "next-heartbeat";
     sessionKey: string;
+    agentId?: string;
     deliver: boolean;
     channel: import("../hooks.js").HookMessageChannel;
     to?: string;
@@ -73,6 +74,7 @@ export function createGatewayWebhooksRequestHandler(params: {
           job,
           message: value.message,
           sessionKey,
+          agentId: value.agentId,
           lane: "cron",
         });
         const summary = result.summary?.trim() || result.error?.trim() || result.status;
