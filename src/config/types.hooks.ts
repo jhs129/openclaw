@@ -110,6 +110,8 @@ export type InternalHooksConfig = {
 export type WebhooksConfig = {
   enabled?: boolean;
   presets?: string[];
+  /** Map of webhook source → agentId to route that source to a specific agent. */
+  agentRoutes?: Record<string, string>;
 };
 
 export type HooksConfig = {

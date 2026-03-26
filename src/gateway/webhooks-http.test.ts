@@ -48,7 +48,7 @@ function createHandler(opts?: {
   const config: WebhooksConfigResolved | null =
     opts?.config !== undefined
       ? opts.config
-      : { token: TOKEN, presets: ["readai"], maxBodyBytes: 256 * 1024 };
+      : { token: TOKEN, presets: ["readai"], maxBodyBytes: 256 * 1024, agentRoutes: {} };
 
   const dispatchAgentHook = opts?.dispatchAgentHook ?? (() => "run-id-1");
 
@@ -209,7 +209,7 @@ describe("webhooks-http", () => {
 
   test("returns 413 for too-large body", async () => {
     const handler = createHandler({
-      config: { token: TOKEN, presets: ["readai"], maxBodyBytes: 10 },
+      config: { token: TOKEN, presets: ["readai"], maxBodyBytes: 10, agentRoutes: {} },
     });
     const req = createMockReq({
       url: `/webhooks/${TOKEN}/readai`,

@@ -605,6 +605,7 @@ export const OpenClawSchema = z
           .object({
             enabled: z.boolean().optional(),
             presets: z.array(z.string()).optional(),
+            agentRoutes: z.record(z.string(), z.string()).optional(),
           })
           .strict()
           .optional(),
