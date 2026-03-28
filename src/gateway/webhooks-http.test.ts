@@ -48,7 +48,13 @@ function createHandler(opts?: {
   const config: WebhooksConfigResolved | null =
     opts?.config !== undefined
       ? opts.config
-      : { token: TOKEN, presets: ["readai"], maxBodyBytes: 256 * 1024, rawMode: [] };
+      : {
+          token: TOKEN,
+          presets: ["readai"],
+          maxBodyBytes: 256 * 1024,
+          rawMode: [],
+          agentRoutes: {},
+        };
 
   const dispatchAgentHook = opts?.dispatchAgentHook ?? (() => "run-id-1");
 
@@ -70,7 +76,13 @@ function createHandler(opts?: {
 describe("webhooks-http", () => {
   test("responds with plain text for validationToken query param (M365 handshake)", async () => {
     const handler = createHandler({
-      config: { token: TOKEN, presets: ["m365-email"], maxBodyBytes: 256 * 1024, rawMode: [] },
+      config: {
+        token: TOKEN,
+        presets: ["m365-email"],
+        maxBodyBytes: 256 * 1024,
+        rawMode: [],
+        agentRoutes: {},
+      },
     });
     const req = createMockReq({
       url: `/webhooks/${TOKEN}/m365-email?validationToken=abc-123-def`,
@@ -223,7 +235,7 @@ describe("webhooks-http", () => {
 
   test("returns 413 for too-large body", async () => {
     const handler = createHandler({
-      config: { token: TOKEN, presets: ["readai"], maxBodyBytes: 10, rawMode: [] },
+      config: { token: TOKEN, presets: ["readai"], maxBodyBytes: 10, rawMode: [], agentRoutes: {} },
     });
     const req = createMockReq({
       url: `/webhooks/${TOKEN}/readai`,
@@ -243,6 +255,7 @@ describe("webhooks-http", () => {
         presets: ["ownerrez"],
         maxBodyBytes: 256 * 1024,
         rawMode: ["ownerrez"],
+        agentRoutes: {},
       },
       dispatchAgentHook: dispatchFn,
     });
@@ -280,6 +293,7 @@ describe("webhooks-http", () => {
         presets: ["shopify"],
         maxBodyBytes: 256 * 1024,
         rawMode: ["shopify"],
+        agentRoutes: {},
       },
       dispatchAgentHook: dispatchFn,
     });
@@ -300,6 +314,7 @@ describe("webhooks-http", () => {
         presets: ["ownerrez"],
         maxBodyBytes: 256 * 1024,
         rawMode: ["ownerrez"],
+        agentRoutes: {},
       },
       dispatchAgentHook: dispatchFn,
     });
@@ -320,6 +335,7 @@ describe("webhooks-http", () => {
         presets: ["readai", "ownerrez"],
         maxBodyBytes: 256 * 1024,
         rawMode: ["ownerrez"],
+        agentRoutes: {},
       },
       dispatchAgentHook: dispatchFn,
     });
@@ -342,5 +358,56 @@ describe("webhooks-http", () => {
     expect(call.name).toBe("Read.ai");
     expect(call.sessionKey).toBe("webhook:readai:sess-mix");
     expect(call.message).toContain("Mixed Mode Test");
+  });
+
+  test("agentRoutes: routes preset to specified agent", async () => {
+    const dispatchFn = vi.fn().mockReturnValue("run-routed-1");
+    const handler = createHandler({
+      config: {
+        token: TOKEN,
+        presets: ["shopify", "readai"],
+        maxBodyBytes: 256 * 1024,
+        rawMode: [],
+        agentRoutes: { shopify: "peterino" },
+      },
+      dispatchAgentHook: dispatchFn,
+    });
+    const body = JSON.stringify({
+      trigger: "meeting_end",
+      session_id: "sess-route",
+      title: "Route Test",
+      summary: "Summary.",
+      action_items: [],
+      key_questions: [],
+      topics: [],
+      owner: { name: "Alice" },
+      participants: [],
+    });
+    // readai has no agentRoutes entry — should dispatch with no agentId
+    const req = createMockReq({ url: `/webhooks/${TOKEN}/readai`, body });
+    const res = createMockRes();
+    await handler(req, res);
+    expect(dispatchFn.mock.calls[0][0].agentId).toBeUndefined();
+  });
+
+  test("agentRoutes: unrouted preset dispatches without agentId", async () => {
+    const dispatchFn = vi.fn().mockReturnValue("run-routed-2");
+    const handler = createHandler({
+      config: {
+        token: TOKEN,
+        presets: ["shopify"],
+        maxBodyBytes: 256 * 1024,
+        rawMode: [],
+        agentRoutes: { shopify: "peterino" },
+      },
+      dispatchAgentHook: dispatchFn,
+    });
+    const req = createMockReq({
+      url: `/webhooks/${TOKEN}/shopify`,
+      body: JSON.stringify({ id: "order-1", line_items: [] }),
+    });
+    const res = createMockRes();
+    await handler(req, res);
+    expect(dispatchFn.mock.calls[0][0].agentId).toBe("peterino");
   });
 });

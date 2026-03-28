@@ -28,6 +28,7 @@ export function createGatewayWebhooksRequestHandler(params: {
     sessionKey: string;
     deliver: boolean;
     channel: import("../hooks.js").HookMessageChannel;
+    agentId?: string;
     to?: string;
     model?: string;
     thinking?: string;
@@ -43,6 +44,7 @@ export function createGatewayWebhooksRequestHandler(params: {
     const job: CronJob = {
       id: jobId,
       name: value.name,
+      agentId: value.agentId,
       enabled: true,
       createdAtMs: now,
       updatedAtMs: now,
