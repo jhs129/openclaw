@@ -43,6 +43,7 @@ export function createGatewayWebhooksRequestHandler(params: {
     const job: CronJob = {
       id: jobId,
       name: value.name,
+      agentId: value.agentId,
       enabled: true,
       createdAtMs: now,
       updatedAtMs: now,
