@@ -46,6 +46,47 @@ Add a `webhooks` section inside your existing `hooks` config:
 - `webhooks.presets` lists which external app transforms to enable
 - `webhooks.enabled` can be set to `false` to disable without removing config (defaults to `true` when `presets` is set)
 
+### Raw JSON Mode
+
+By default, webhook presets transform payloads into formatted markdown messages. To receive
+the raw JSON payload instead (useful for automation and custom processing), add the preset
+to the `rawMode` array:
+
+```json5
+{
+  hooks: {
+    enabled: true,
+    token: "your-secret-token",
+    webhooks: {
+      presets: ["readai", "ownerrez"],
+      rawMode: ["ownerrez"], // Receive raw JSON for OwnerRez
+    },
+  },
+}
+```
+
+When `rawMode` is enabled for a preset:
+
+- The agent receives the complete JSON payload as a formatted string
+- No data is lost in transformation
+- Session keys are derived from common ID fields (`entity_id`, `id`, `session_id`)
+- Useful when you need access to nested objects or fields not included in the formatted message
+
+**Example raw mode message:**
+
+```json
+{
+  "id": "8bd75001-3c0a-4a38-9d81-668fd6be0085",
+  "user_id": 347443214,
+  "action": "entity_update",
+  "entity_type": "booking",
+  "entity_id": 17152244,
+  "entity": {
+    "guest_name": "Alice Smith"
+  }
+}
+```
+
 ## Endpoint
 
 ### `POST /webhooks/{token}/{source}`
@@ -547,6 +588,74 @@ only the JSON body through the webhook endpoint, event types are inferred from t
 - **Refunds**: `order_id` and `refund_line_items`
 
 This auto-detection means you can register a single webhook URL for all Shopify event types.
+
+### `m365-email` - Microsoft 365 Email
+
+Monitor a Microsoft 365 mailbox for new emails via [Microsoft Graph API change notifications](https://learn.microsoft.com/en-us/graph/webhooks).
+
+**Webhook URL:**
+
+```
+https://your-gateway.example.com/webhooks/{token}/m365-email
+```
+
+**Enable in config:**
+
+```json5
+{
+  hooks: {
+    webhooks: {
+      presets: ["m365-email"],
+    },
+  },
+}
+```
+
+**Create a subscription via Graph API:**
+
+```http
+POST https://graph.microsoft.com/v1.0/subscriptions
+Content-Type: application/json
+
+{
+  "changeType": "created",
+  "notificationUrl": "https://your-gateway.example.com/webhooks/{token}/m365-email",
+  "resource": "/users/{email}/mailFolders('inbox')/messages",
+  "expirationDateTime": "2026-04-30T00:00:00Z",
+  "clientState": "optional-state-string"
+}
+```
+
+During subscription creation, Microsoft sends a `?validationToken=...` GET/POST to confirm the
+endpoint is reachable. OpenClaw responds automatically with the token as plain text — no
+configuration needed.
+
+**Notification payload** (sent when a new email arrives):
+
+```json
+{
+  "value": [
+    {
+      "subscriptionId": "guid",
+      "clientState": "optional-state-string",
+      "changeType": "created",
+      "resource": "users/larry@example.com/messages/AAMkAGNm...",
+      "resourceData": {
+        "@odata.type": "#Microsoft.Graph.Message",
+        "@odata.id": "users/larry@example.com/messages/AAMkAGNm..."
+      }
+    }
+  ]
+}
+```
+
+The agent message includes the mailbox address, message ID, and change type. Use the message ID
+with the Graph API to fetch the full email content.
+
+**Subscription renewal:**
+
+Mailbox subscriptions expire after a maximum of 4,230 minutes (~3 days). Set up a cron job or
+scheduled skill to renew before expiration using `PATCH /subscriptions/{id}`.
 
 ## Security
 
