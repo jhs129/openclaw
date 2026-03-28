@@ -131,6 +131,82 @@ describe("transformOwnerRezPayload", () => {
     expect(transformOwnerRezPayload(payload)).toBeNull();
   });
 
+  test("includes guest_id, guest_email, guest_phone, property_id from top-level payload", () => {
+    const payload = {
+      id: "wh-7",
+      action: "entity_update",
+      entity_type: "booking",
+      entity_id: "bk-500",
+      guest_id: "g-42",
+      guest_email: "alice@example.com",
+      guest_phone: "+15559876543",
+      property_id: "prop-99",
+    };
+
+    const result = transformOwnerRezPayload(payload);
+    expect(result).not.toBeNull();
+    expect(result!.message).toContain("**Guest ID:** g-42");
+    expect(result!.message).toContain("**Guest Email:** alice@example.com");
+    expect(result!.message).toContain("**Guest Phone:** +15559876543");
+    expect(result!.message).toContain("**Property ID:** prop-99");
+  });
+
+  test("includes guest_id and property_id from embedded entity when not at top level", () => {
+    const payload = {
+      id: "wh-8",
+      action: "entity_insert",
+      entity_type: "booking",
+      entity_id: "bk-600",
+      entity: {
+        guest_id: "g-77",
+        email: "bob@example.com",
+        phone: "+15551112222",
+        property_id: "prop-55",
+      },
+    };
+
+    const result = transformOwnerRezPayload(payload);
+    expect(result).not.toBeNull();
+    expect(result!.message).toContain("**Guest ID:** g-77");
+    expect(result!.message).toContain("**Guest Email:** bob@example.com");
+    expect(result!.message).toContain("**Guest Phone:** +15551112222");
+    expect(result!.message).toContain("**Property ID:** prop-55");
+  });
+
+  test("omits identity fields when none are present", () => {
+    const payload = {
+      id: "wh-9",
+      action: "entity_update",
+      entity_type: "booking",
+      entity_id: "bk-700",
+    };
+
+    const result = transformOwnerRezPayload(payload);
+    expect(result).not.toBeNull();
+    expect(result!.message).not.toContain("Guest ID");
+    expect(result!.message).not.toContain("Guest Email");
+    expect(result!.message).not.toContain("Guest Phone");
+    expect(result!.message).not.toContain("Property ID");
+  });
+
+  test("always includes full raw payload as JSON code block", () => {
+    const payload = {
+      id: "wh-10",
+      action: "entity_update",
+      entity_type: "booking",
+      entity_id: "bk-800",
+      guest_id: "g-99",
+      custom_field: "some-value",
+    };
+
+    const result = transformOwnerRezPayload(payload);
+    expect(result).not.toBeNull();
+    expect(result!.message).toContain("**Raw Payload:**");
+    expect(result!.message).toContain("```json");
+    expect(result!.message).toContain('"custom_field": "some-value"');
+    expect(result!.message).toContain('"guest_id": "g-99"');
+  });
+
   test("handles multiple children correctly in guest count", () => {
     const payload = {
       id: "wh-6",
