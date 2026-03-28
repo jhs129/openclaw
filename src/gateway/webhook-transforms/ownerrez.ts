@@ -56,6 +56,7 @@ export function transformOwnerRezPayload(
   lines.push(`## OwnerRez: ${label} ${operation}`);
   lines.push("");
 
+  /** TODO: delete if not needed */
   if (entityId) {
     lines.push(`**${label} ID:** ${entityId}`);
   }
@@ -105,6 +106,8 @@ export function transformOwnerRezPayload(
     lines.push("");
     lines.push(...identityFields);
   }
+
+  /** TODO: End delete if not needed */
 
   // Always append the full raw payload so the agent can access any field not
   // extracted above without needing a separate Graph API fetch.
