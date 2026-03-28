@@ -56,6 +56,7 @@ export function transformOwnerRezPayload(
   lines.push(`## OwnerRez: ${label} ${operation}`);
   lines.push("");
 
+  /** TODO: delete if not needed */
   if (entityId) {
     lines.push(`**${label} ID:** ${entityId}`);
   }
@@ -73,6 +74,48 @@ export function transformOwnerRezPayload(
   } else if (entity && entityType.toLowerCase() === "contact") {
     formatContactEntity(entity, lines);
   }
+
+  // Always include key identity fields when available — sourced from top-level
+  // payload or the embedded entity object so nothing is lost.
+  const guestId =
+    stringField(payload, "guest_id") || (entity ? stringField(entity, "guest_id") : "");
+  const guestEmail =
+    stringField(payload, "guest_email") ||
+    (entity ? stringField(entity, "email") || stringField(entity, "email_address") : "");
+  const guestPhone =
+    stringField(payload, "guest_phone") ||
+    (entity ? stringField(entity, "phone") || stringField(entity, "phone_number") : "");
+  const propertyId =
+    stringField(payload, "property_id") || (entity ? stringField(entity, "property_id") : "");
+
+  const identityFields: string[] = [];
+  if (guestId) {
+    identityFields.push(`**Guest ID:** ${guestId}`);
+  }
+  if (guestEmail) {
+    identityFields.push(`**Guest Email:** ${guestEmail}`);
+  }
+  if (guestPhone) {
+    identityFields.push(`**Guest Phone:** ${guestPhone}`);
+  }
+  if (propertyId) {
+    identityFields.push(`**Property ID:** ${propertyId}`);
+  }
+
+  if (identityFields.length > 0) {
+    lines.push("");
+    lines.push(...identityFields);
+  }
+
+  /** TODO: End delete if not needed */
+
+  // Always append the full raw payload so the agent can access any field not
+  // extracted above without needing a separate Graph API fetch.
+  lines.push("");
+  lines.push("**Raw Payload:**");
+  lines.push("```json");
+  lines.push(JSON.stringify(payload, null, 2));
+  lines.push("```");
 
   const payloadId = stringField(payload, "id");
   const message = lines.join("\n").trim();
