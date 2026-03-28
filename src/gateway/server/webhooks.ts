@@ -28,6 +28,7 @@ export function createGatewayWebhooksRequestHandler(params: {
     sessionKey: string;
     deliver: boolean;
     channel: import("../hooks.js").HookMessageChannel;
+    agentId?: string;
     to?: string;
     model?: string;
     thinking?: string;
